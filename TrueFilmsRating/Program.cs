@@ -138,13 +138,15 @@ namespace TrueFilmsRating
                 }
 
                 int im = 1;
+                var properties = typeof(IMDbResponse).GetProperties();
                 foreach (var movie in movies)
                 {
                     IRow row = sheet.CreateRow(im);
                     for (int j = 0; j < colNames.Count; j++)
                     {
                         ICell cell = row.CreateCell(j);
-                        cell.SetCellValue(typeof(IMDbResponse).GetProperties().Single(p => string.Equals(p.Name, colNames[j])).GetValue(movie).ToString());
+                        var prop = properties.SingleOrDefault(p => string.Equals(p.Name, colNames[j]));
+                        cell.SetCellValue(prop == null ? "" : prop.GetValue(movie)?.ToString());
                     }
                     im++;
                 }

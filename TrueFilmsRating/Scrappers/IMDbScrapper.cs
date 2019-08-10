@@ -69,10 +69,18 @@ namespace TrueFilmsRating.Scrappers
 
         public async Task<IMDbResponse> GetMovie(string title, int flurlClientIndex = 0)
         {
-            return await _flurlClients[flurlClientIndex].Request()
+            try
+            {
+                return await _flurlClients[flurlClientIndex].Request()
                 .SetQueryParams(new { apikey = _APIKey, t = title })
                 .WithTimeout(10)
                 .GetJsonAsync<IMDbResponse>();
+            }
+            catch (Exception)
+            {
+                return new IMDbResponse();
+            }
+            
         }
 
         public void Dispose()
