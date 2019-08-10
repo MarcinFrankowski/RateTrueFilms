@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using TrueFilmsRating.Models;
 using TrueFilmsRating.Scrappers;
 
 namespace TrueFilmsRating
@@ -33,9 +34,9 @@ namespace TrueFilmsRating
             Console.Out.WriteLine("Getting titles...");
             TrueFilmsScrapper tfScrapper = new TrueFilmsScrapper(trueFilmsUrl, numberOfThreads);
             var titlesCollections = await tfScrapper.GetTitlesAsync();
-            Console.Out.WriteLine($"Found {titlesCollections.Sum(c=>c.Count())} titles.{rn}");
+            Console.Out.WriteLine($"Found {titlesCollections.Sum(c => c.Count())} titles.{rn}");
 
-            Console.Out.Write("Getting ratings...");
+            Console.Out.Write($"Getting ratings...{rn}");
             IMDbScrapper imdbScrapper = new IMDbScrapper(APIUrl, numberOfThreads, APIKey);
 
             List<List<string>> mockColl = new List<List<string>>();
@@ -44,9 +45,45 @@ namespace TrueFilmsRating
             mockColl.Add(new List<string> { "water", "iron man" });
 
             var movies = await imdbScrapper.GetAllMoviesAsync(mockColl);
+            Console.Out.Write($"Found ratings for {movies.Count()} movies.{rn}{rn}");
 
-            Console.WriteLine("Press any key to close...");
-            Console.ReadKey();
+            bool keepGoing = true;
+            while (keepGoing)
+            {
+                Console.Out.Write($"What now? Choose an option by pressing a key:{rn}" +
+                    $"1 - Display movies ordered by rating.{rn}" +
+                    $"2 - Save movies data to movies.csv.{rn}" +
+                    $"x - Close.{rn}");
+
+                var key = Console.ReadKey().KeyChar;
+
+                switch (key)
+                {
+                    case '1':
+                        DisplayMovies(movies);
+                        break;
+                    case '2':
+                        SaveMovies(movies);
+                        break;
+                    case 'X':
+                    case 'x':
+                        keepGoing = false;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+        }
+
+        private static void DisplayMovies(IEnumerable<IMDbResponse> movies)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void SaveMovies(IEnumerable<IMDbResponse> movies)
+        {
+            throw new NotImplementedException();
         }
 
         #region private methods
