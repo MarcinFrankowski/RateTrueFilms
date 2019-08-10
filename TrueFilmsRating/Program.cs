@@ -1,6 +1,8 @@
 ﻿using HtmlAgilityPack;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using TrueFilmsRating.Scrappers;
@@ -13,14 +15,16 @@ namespace TrueFilmsRating
 
         static async Task Main(string[] args)
         {
-            string trueFilmsUrl = "http://truefilms.com";
-            int numberOfThreads = 3;
+            var config = GetConfig();
 
-            if (args.Length > 1)
+            string trueFilmsUrl = config["trueFilmsUrl"];
+            int numberOfThreads = Int32.Parse(config["numberOfThreads"]);
+            string APIKey = config["IMDbApiKey"];
+
+            if (args.Length > 0)
             {
-                Console.Out.WriteLine("Getting url and thread count from run arguments.");
-                trueFilmsUrl = args[0];
-                Int32.TryParse(args[1], out numberOfThreads);
+                Console.Out.WriteLine("Getting API Key from arguments.");
+                APIKey = args[0];
             }
             Console.Out.WriteLine($"TrueFilms URL: {trueFilmsUrl}, running on {numberOfThreads} threads.{rn}");
 
@@ -34,5 +38,17 @@ namespace TrueFilmsRating
             Console.WriteLine("Press any key to close...");
             Console.ReadKey();
         }
+
+        #region private methods
+        private static IConfigurationRoot GetConfig()
+        {
+            IConfigurationBuilder builder = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+
+            IConfigurationRoot configuration = builder.Build();
+            return configuration;
+        }
+        #endregion
     }
 }
