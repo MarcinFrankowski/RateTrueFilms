@@ -20,6 +20,7 @@ namespace TrueFilmsRating
             string trueFilmsUrl = config["trueFilmsUrl"];
             int numberOfThreads = Int32.Parse(config["numberOfThreads"]);
             string APIKey = config["IMDbApiKey"];
+            string APIUrl = config["IMDbApiUrl"];
 
             if (args.Length > 0)
             {
@@ -34,6 +35,8 @@ namespace TrueFilmsRating
             var titlesCollections = await tfScrapper.GetTitlesAsync();
             Console.Out.WriteLine($"Found {titlesCollections.Sum(c=>c.Count())} titles.{rn}");
 
+            Console.Out.Write("Getting ratings...");
+            IMDbScrapper imdbScrapper = new IMDbScrapper(APIUrl, numberOfThreads, APIKey);
 
             Console.WriteLine("Press any key to close...");
             Console.ReadKey();
