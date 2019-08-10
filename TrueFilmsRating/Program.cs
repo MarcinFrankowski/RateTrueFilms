@@ -47,23 +47,21 @@ namespace TrueFilmsRating
             var movies = await imdbScrapper.GetAllMoviesAsync(mockColl);
             Console.Out.Write($"Found ratings for {movies.Count()} movies.{rn}{rn}");
 
+            DisplayMenu();
             bool keepGoing = true;
             while (keepGoing)
             {
-                Console.Out.Write($"What now? Choose an option by pressing a key:{rn}" +
-                    $"1 - Display movies ordered by rating.{rn}" +
-                    $"2 - Save movies data to movies.csv.{rn}" +
-                    $"x - Close.{rn}");
-
-                var key = Console.ReadKey().KeyChar;
+                var key = Console.ReadKey(true).KeyChar;
 
                 switch (key)
                 {
                     case '1':
                         DisplayMovies(movies);
+                        DisplayMenu();
                         break;
                     case '2':
                         SaveMovies(movies);
+                        DisplayMenu();
                         break;
                     case 'X':
                     case 'x':
@@ -76,9 +74,27 @@ namespace TrueFilmsRating
 
         }
 
+        #region private methods
+        private static void DisplayMenu()
+        {
+            Console.Out.Write($"{rn}What now? Choose an option by pressing a key:{rn}" +
+                $"1 - Display movies ordered by rating.{rn}" +
+                $"2 - Save movies data to movies.csv.{rn}" +
+                $"x - Close.{rn}");
+        }
+
         private static void DisplayMovies(IEnumerable<IMDbResponse> movies)
         {
-            throw new NotImplementedException();
+            movies = movies.OrderByDescending(m => m.imdbRating);
+            Console.Out.WriteLine($"{rn}{rn}List of movies by rating:");
+            Console.Out.WriteLine($"Number \t Rating \t Title");
+
+            int i = 1;
+            foreach (var movie in movies)
+            {
+                Console.Out.WriteLine($"{i}. \t {movie.imdbRating}/10 \t {movie.Title} ({movie.Released})");
+                i++;
+            }
         }
 
         private static void SaveMovies(IEnumerable<IMDbResponse> movies)
@@ -86,7 +102,6 @@ namespace TrueFilmsRating
             throw new NotImplementedException();
         }
 
-        #region private methods
         private static IConfigurationRoot GetConfig()
         {
             IConfigurationBuilder builder = new ConfigurationBuilder()
