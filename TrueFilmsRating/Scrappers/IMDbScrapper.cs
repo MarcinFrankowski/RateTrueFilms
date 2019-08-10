@@ -31,6 +31,42 @@ namespace TrueFilmsRating.Scrappers
             }
         }
 
+        public async Task<IEnumerable<IMDbResponse>> GetAllMoviesAsync(IEnumerable<IEnumerable<string>> titlesCollections)
+        {
+            List<Task<IEnumerable<IMDbResponse>>> getTasks = new List<Task<IEnumerable<IMDbResponse>>>();
+            int i = 0;
+            foreach (var titles in titlesCollections)
+            {
+                getTasks.Add(GetMoviesAsync(titles, i));
+                i++;
+            }
+
+            var moviesCollections = await Task.WhenAll(getTasks);
+
+            // Flatten collection
+            var movies = moviesCollections.SelectMany(collection => collection).Distinct();
+
+            return movies;
+        }
+
+        public async Task<IEnumerable<IMDbResponse>> GetMoviesAsync(IEnumerable<string> titles, int flurlClientIndex = 0)
+        {
+            var movies = new List<IMDbResponse>();
+            foreach (var title in titles)
+            {
+                var movie = await this.GetMovie(title, flurlClientIndex);
+                if (string.Equals(movie.Response, "True"))
+                {
+                    movies.Add(movie);
+                }
+                else
+                {
+                    Console.Out.WriteLine($"Failed to find movie {title}.");
+                }
+            }
+            return movies;
+        }
+
         public async Task<IMDbResponse> GetMovie(string title, int flurlClientIndex = 0)
         {
             return await _flurlClients[flurlClientIndex].Request()

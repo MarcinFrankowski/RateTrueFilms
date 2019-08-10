@@ -38,6 +38,13 @@ namespace TrueFilmsRating
             Console.Out.Write("Getting ratings...");
             IMDbScrapper imdbScrapper = new IMDbScrapper(APIUrl, numberOfThreads, APIKey);
 
+            List<List<string>> mockColl = new List<List<string>>();
+            mockColl.Add(new List<string> { "sand", "stone" });
+            mockColl.Add(new List<string> { "wind", "fire" });
+            mockColl.Add(new List<string> { "water", "iron man" });
+
+            var movies = await imdbScrapper.GetAllMoviesAsync(mockColl);
+
             Console.WriteLine("Press any key to close...");
             Console.ReadKey();
         }
